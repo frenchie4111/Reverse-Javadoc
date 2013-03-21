@@ -33,9 +33,9 @@ def find_methods_summary( html_summary ):
             current_method = method()
             for table_code in table_row.find_all("code", recursive="true"):
                 if( current_method.return_type == "" ):
-                    current_method.return_type = table_code.text.strip()
+                    current_method.return_type = table_code.text.strip().replace(u'\xa0', u' ')
                 else:
-                    current_method.method_name = table_code.text.strip()
+                    current_method.method_name = table_code.text.strip().replace(u'\xa0', u' ')
             method_list.append(current_method)
     return method_list
 
