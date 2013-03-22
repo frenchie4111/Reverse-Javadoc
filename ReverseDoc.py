@@ -25,7 +25,10 @@ class static_field:
         self.name = ""
 
     def __str__(self):
-        return self.instance_type + " " + self.name + "\n";
+        return "\t" + self.instance_type + " " + self.name + "\n";
+
+class constructor:
+    
 
 class written_class:
     __slots__ = ("head_text", "methods", "fields")
@@ -67,13 +70,11 @@ def find_fields( html ):
     soup = BeautifulSoup( html )
     for table_row in soup.find("a", {"name":"field_summary"}, recursive="true").findNext("table").find_all("tr", recursive="true"):
         if( table_row.text.strip() != "Field Summary" ):
+            new_field = static_field()
             for table_code in table_row.find_all("code", recursive="true"):
-                print( "table_code: '" + clean_string( table_code.text ) + "'" )
-                new_field = static_field()
                 if( new_field.instance_type == "" ):
                     new_field.instance_type = clean_string(table_code.text)
                 else:
-                    print( "added field name: '" + table_code.text + "'" )
                     new_field.name = clean_string(table_code.text)
             fields_list.append(new_field)
     return fields_list
