@@ -2,7 +2,36 @@
 import sys
 from bs4 import BeautifulSoup
 
+class comment:
+    """
+        comment stores a comment for later printing
+        
+        slots:
+            comment_type - The type of comment. Either "line" or "block"
+            comment_lines - The lines of the comment. If comment_type==line then comment_lines should only have one index
+    """
+    __slots__ = ("comment_type", "comment_lines")
+
+    def __init__(self):
+        self.comment_type = ""
+        self.comment_lines = list()
+
+    def __str__(self):
+        if (self.comment_type == "block"):
+            new_str = "\t/**\n"
+            for comment_line in comment_lines:
+                new_str += "\t * " + comment_line + "\n"
+            new_str += "\t */\n"
+
 class method:
+    """
+        Method stores information about a particular method for later printing
+
+        slots:
+            comments - the comments from the javadoc about the method
+            return_type - the type it returns
+            method_name - the name of the method
+    """
     __slots__ = ("comments", "return_type", "method_name")
 
     def __init__(self):
@@ -11,24 +40,42 @@ class method:
         self.method_name = ""
 
     def get_method_text(self):
-        #Returns the text of the method
+        """
+            Returns the method text in this format:
+            /**
+             * self.comments
+             */
+             public self.return_type self.method_name {
+                //Body
+            }
+        """
         return self.comments + "\n\tpublic " + self.return_type + " " + self.method_name + " {" + "\n\t\t" + "//Body" + "\n\t" + "}"
 
     def __str__(self):
         return self.get_method_text()
 
 class static_field:
-    __slots__ = ("instance_type","name")
+    """
+        Stores a single static field of a class for later printing
+        
+        slots:
+            comment - the comments from the javadoc about the method
+            instance_type - the type of the static variable
+            name - the name of the variable
+    """
+    __slots__ = ("comment","instance_type","name")
  
     def __init__(self):
         self.instance_type = ""
         self.name = ""
 
     def __str__(self):
+        """
+            Returns the field in this format:
+            //comment
+            self.instance_type self.name
+        """
         return "\t" + self.instance_type + " " + self.name + "\n";
-
-class constructor:
-    
 
 class written_class:
     __slots__ = ("head_text", "methods", "fields")
