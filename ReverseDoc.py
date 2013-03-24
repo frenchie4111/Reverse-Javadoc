@@ -69,7 +69,7 @@ class method:
         }
     """        
     def __str__(self):
-       return str( self.comments ) + "\tpublic " + self.return_type + " " + self.method_name + " {" + "\n\t\t" + "//Body" + "\n\t" + "}\n\n"
+       return str( self.comments ) + "\tpublic " + self.return_type + " " + self.method_name + " {" + "\n\t\t" + "//TODO Add method body for " + self.method_name  + "\n\t" + "}\n\n"
 
 """
     class static_field
