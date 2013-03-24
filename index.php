@@ -1,6 +1,7 @@
-Paste JavaDoc page source here:
+Paste url of JavaDoc page here:
 <form action="index.php" method="post">
-<input type="text" name="url" /><br/>
+<input type="text" name="url" style="width:600px;"/><br/>
+Code comes out here:<br/>
 <textarea rows="18" cols="110" width=100% name="note">
 <?php
 $haveDoc = false;
@@ -20,8 +21,6 @@ if (isset($_REQUEST["url"]))
 {
 	$url_file = file_get_contents($_REQUEST["url"]);
 
-	shell_exec("touch downloads/" + $_REQUEST["url"]);
-
 	$writeFile = fopen("temp.txt","w");
 	$newStat =  $url_file;
 	fwrite($writeFile,$newStat);
@@ -32,7 +31,8 @@ if (isset($_REQUEST["url"]))
 
 if( $haveDoc && $docLocation != "" )
 {
-	echo passthru('./ReverseDoc.py < ' + $docLocation + ' > temp.java');
+	# shell_exec('ReverseDoc.py < temp.txt > temp.java');
+	passthru( "./runReverseDoc.sh" );
 
 	$file = fopen("temp.java","r");
 	while(!feof($file))

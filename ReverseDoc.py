@@ -96,7 +96,7 @@ class static_field:
         self.instance_type self.name
     """
     def __str__(self):
-        return "\t" + self.instance_type + " " + self.name + "\n";
+        return "\tpublic " + self.instance_type + " " + self.name + "\n";
 
 """
     class writen_class
