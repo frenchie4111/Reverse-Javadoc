@@ -31,12 +31,12 @@ class comment:
     def __str__(self):
         if (self.comment_type == "block"):
             new_str = "\t/**\n"
-            for comment_line in comment_lines:
+            for comment_line in self.comment_lines:
                 new_str += "\t * " + comment_line + "\n"
             new_str += "\t */\n"
             return new_str
         if (self.comment_type == "line"):
-            new_str = "\t# " + comment_lines[0];
+            new_str = "\t# " + self.comment_lines[0];
         return ""
 
 """
@@ -53,7 +53,7 @@ class method:
     __slots__ = ("comments", "return_type", "method_name")
 
     def __init__(self):
-        self.comments = ""
+        self.comments = comment()
         self.return_type = ""
         self.method_name = ""
 
@@ -69,7 +69,7 @@ class method:
         }
     """        
     def __str__(self):
-       return self.comments + "\n\tpublic " + self.return_type + " " + self.method_name + " {" + "\n\t\t" + "//Body" + "\n\t" + "}"
+       return str( self.comments ) + "\tpublic " + self.return_type + " " + self.method_name + " {" + "\n\t\t" + "//Body" + "\n\t" + "}\n\n"
 
 """
     class static_field
@@ -158,10 +158,32 @@ def find_methods_summary( html_summary ):
 
     Arguments:
         methods_list - list of all of the methods
-        html_full - BeautifulSoup string of the full page
+        html - string of whole page
 """
-def find_methods_details( methods_list, html_full ):
-    pass
+def find_methods_details( methods_list, html ):
+    soup = BeautifulSoup( html )
+    for method in methods_list:
+        method_details = soup.find("a", {"name":method.method_name}, recursive="true")
+        if( method_details ):
+            method.comments = create_comment( clean_string( method_details.findNext("dl").text ) )
+
+"""
+    method create_comment
+
+    Creates a comment object from a given string
+
+    Arguments:
+        comment_text - the text to be in the comment
+"""
+def create_comment( comment_text ):
+    new_comment = comment()
+
+    new_comment.comment_type = "block"
+
+    for line in comment_text.split("\n"):
+        new_comment.comment_lines.append( clean_string( line ) )
+
+    return new_comment
 
 """
     method find_methods
@@ -175,8 +197,9 @@ def find_methods( html ):
     methods_list = list()
     soup = BeautifulSoup( html )
     method_summary = soup.find("a", {"name":"method_summary"} ,recursive="true").findNext("table")
-    method_list = find_methods_summary( method_summary )
-    find_methods_details(methods_list, html)    
+    if( method_summary ):
+        method_list = find_methods_summary( method_summary )
+        find_methods_details(method_list, html)    
     return method_list
 
 """
@@ -190,15 +213,17 @@ def find_methods( html ):
 def find_fields( html ):
     fields_list = list()
     soup = BeautifulSoup( html )
-    for table_row in soup.find("a", {"name":"field_summary"}, recursive="true").findNext("table").find_all("tr", recursive="true"):
-        if( table_row.text.strip() != "Field Summary" ):
-            new_field = static_field()
-            for table_code in table_row.find_all("code", recursive="true"):
-                if( new_field.instance_type == "" ):
-                    new_field.instance_type = clean_string(table_code.text)
-                else:
-                    new_field.name = clean_string(table_code.text)
-            fields_list.append(new_field)
+    field_summary = soup.find("a", {"name":"field_summary"}, recursive="true")
+    if( field_summary ):
+        for table_row in field_summary.findNext("table").find_all("tr", recursive="true"):
+            if( table_row.text.strip() != "Field Summary" ):
+                new_field = static_field()
+                for table_code in table_row.find_all("code", recursive="true"):
+                    if( new_field.instance_type == "" ):
+                        new_field.instance_type = clean_string(table_code.text)
+                    else:
+                        new_field.name = clean_string(table_code.text)
+                fields_list.append(new_field)
     return fields_list
 
 """
@@ -236,7 +261,7 @@ def clean_string( string ):
 """
 def find_class_name( html ):
     soup = BeautifulSoup( html )
-    my_class = clean_string( soup.find("pre").text.strip('\n').strip('java.lang.Object') )
+    my_class = clean_string( soup.find("pre").text )
     return my_class
 
 """
