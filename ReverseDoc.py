@@ -122,18 +122,21 @@ class written_class:
 
         Returns the class as a string in the format:
         class self.head_text + {
-            print_fields( self.fields )
+            str_list( self.fields )
 
-            print_methods( self.methods )
+            str_list( self.methods )
         }
     """
     def __str__(self):
-        return "class " + self.head_text + " {\n\n" + print_fields( self.fields ) + "\n\n" +  print_methods( self.methods )  + "\n}"
+        return "class " + self.head_text + " {\n\n" + str_list( self.fields ) + "\n\n" +  str_list( self.methods )  + "\n}"
 
 """
     method find_methods_summary
 
     Searches through the methods summary section of the JavaDoc and returns a list of methods without comments
+
+    Arguments:
+        html_summary - BeautifulSoup string of just the method summary area
 """
 def find_methods_summary( html_summary ):
     method_list = list()
@@ -148,9 +151,26 @@ def find_methods_summary( html_summary ):
             method_list.append(current_method)
     return method_list
 
+"""
+    method find_methods_details
+
+    Adds comments from the method details area of the javadocs to the methods
+
+    Arguments:
+        methods_list - list of all of the methods
+        html_full - BeautifulSoup string of the full page
+"""
 def find_methods_details( methods_list, html_full ):
     pass
 
+"""
+    method find_methods
+
+    Finds all of the methods and then all of their comments and returns a list containing them
+
+    Arguments:
+        html - string of the page source
+"""
 def find_methods( html ):
     methods_list = list()
     soup = BeautifulSoup( html )
@@ -159,6 +179,14 @@ def find_methods( html ):
     find_methods_details(methods_list, html)    
     return method_list
 
+"""
+    method find_fields
+
+    Finds all of the fields and returns them as a python list of type static_field
+
+    Arguments:
+        html - string of the page source
+"""
 def find_fields( html ):
     fields_list = list()
     soup = BeautifulSoup( html )
@@ -173,26 +201,52 @@ def find_fields( html ):
             fields_list.append(new_field)
     return fields_list
 
-def print_methods( method_list ):
-    new_str_methods = ""
-    for method in method_list:
-        new_str_methods += str( method )
-    return new_str_methods
+"""
+    method str_list
 
-def print_fields( field_list ):
-    new_str_fields = ""
-    for field in field_list:
-        new_str_fields += str( field )
-    return new_str_fields
+    Return a string containing the str( ) of the items in the given pyList
 
+    Arguments:
+        pyList - python list to be converted to string
+"""
+def str_list( pyList ):
+    new_str = ""
+    for list_item in pyList:
+        new_str += str( list_item )
+    return new_str
+
+"""
+    method clean_string
+
+    Cleans a string of unicode characters and newlines
+
+    Arguments:
+        string - string to be cleaned and returned
+"""
 def clean_string( string ):
     return string.strip().replace(u'\xa0', u' ')
 
+"""
+    method find_class_name
+
+    finds a returns the name of the class on the page
+
+    Arguments:
+        html - the pages html
+"""
 def find_class_name( html ):
     soup = BeautifulSoup( html )
-    my_class = soup.find("pre").text.strip('\n').strip('java.lang.Object')
+    my_class = clean_string( soup.find("pre").text.strip('\n').strip('java.lang.Object') )
     return my_class
 
+"""
+    method ReverseDoc
+
+    takes a pages html and prints out the class that's described on the page
+
+    Arguments:
+        html - the pages html
+"""
 def ReverseDoc( html ):
     my_class = written_class()
     my_class.head_text = find_class_name( html )
@@ -200,7 +254,6 @@ def ReverseDoc( html ):
 
     my_class.methods = find_methods( html )
     print str( my_class ) 
-    
 
 def main():
     input_html = sys.stdin.read()
