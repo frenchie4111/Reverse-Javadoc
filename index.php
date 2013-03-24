@@ -1,24 +1,45 @@
+Paste JavaDoc page source here:
 <form action="index.php" method="post">
-<img src="cpp.png" alt="Are you happy now Grace?!"/><br />
-<textarea rows="18" cols="110" name="note">
+<input type="text" name="url" /><br/>
+<textarea rows="18" cols="110" width=100% name="note">
 <?php
-if (!$_POST["note"] == "")
+$haveDoc = false;
+$docLocation = "";
+
+if (isset($_POST["note"]))
 {
-	$writeFile = fopen("test.cpp","w");
+	$writeFile = fopen("temp.txt","w");
 	$newStat =  $_POST["note"];
 	fwrite($writeFile,$newStat);
 	fclose($writeFile);
-	passthru('uncrustify -c /home/alkaline/share/beauty/config.cfg -f /home/alkaline/share/beauty/test.cpp -o /home/alkaline/share/beauty/test.cpp');
-	passthru('/home/alkaline/share/beauty/log.sh');
+	$haveDoc = true;
+	$docLocation = "temp.txt";
+}
 
+if (isset($_REQUEST["url"]))
+{
+	$url_file = file_get_contents($_REQUEST["url"]);
 
+	shell_exec("touch downloads/" + $_REQUEST["url"]);
 
-$file = fopen("test.cpp","r");
-while(!feof($file))
-  {
-  echo fgets($file);
-  }
-fclose($file);
+	$writeFile = fopen("temp.txt","w");
+	$newStat =  $url_file;
+	fwrite($writeFile,$newStat);
+	fclose($writeFile);
+	$haveDoc = true;
+	$docLocation = "temp.txt";
+}
+
+if( $haveDoc && $docLocation != "" )
+{
+	echo passthru('./ReverseDoc.py < ' + $docLocation + ' > temp.java');
+
+	$file = fopen("temp.java","r");
+	while(!feof($file))
+  	{
+  		echo fgets($file);
+  	}
+	fclose($file);
 }
 ?>
 </textarea>
