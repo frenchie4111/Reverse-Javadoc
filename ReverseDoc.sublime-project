@@ -9,7 +9,7 @@
 	[
 		{
 			"name": "CarRadio",
-			"cmd": ["C:/Python27/python.exe ReverseDoc.py < tests/CarRadio.html"],
+			"cmd": ["C:/Python27/python.exe ReverseDoc.py < tests/CarRadio.html > test.java"],
 			"shell":true
 		},
 		{
