@@ -2,36 +2,54 @@
 import sys
 from bs4 import BeautifulSoup
 
+"""
+    class comment
+
+    comment stores a comment for later printing
+    
+    slots:
+        comment_type - The type of comment. Either "line" or "block"
+        comment_lines - The lines of the comment. If comment_type==line then comment_lines should only have one index
+"""
 class comment:
-    """
-        comment stores a comment for later printing
-        
-        slots:
-            comment_type - The type of comment. Either "line" or "block"
-            comment_lines - The lines of the comment. If comment_type==line then comment_lines should only have one index
-    """
     __slots__ = ("comment_type", "comment_lines")
 
     def __init__(self):
         self.comment_type = ""
         self.comment_lines = list()
 
+    """
+        method __str__(self)
+
+        if comment_type is "block" returns comment string in format:
+            /**
+             * self.comment_lines
+             */
+        if comment_type is "line" reutrns comment string in format:
+            # self.comment_lines[0]
+    """
     def __str__(self):
         if (self.comment_type == "block"):
             new_str = "\t/**\n"
             for comment_line in comment_lines:
                 new_str += "\t * " + comment_line + "\n"
             new_str += "\t */\n"
+            return new_str
+        if (self.comment_type == "line"):
+            new_str = "\t# " + comment_lines[0];
+        return ""
 
+"""
+    class method
+
+    Method stores information about a particular method for later printing
+
+    slots:
+        comments - the comments from the javadoc about the method
+        return_type - the type it returns
+        method_name - the name of the method
+"""
 class method:
-    """
-        Method stores information about a particular method for later printing
-
-        slots:
-            comments - the comments from the javadoc about the method
-            return_type - the type it returns
-            method_name - the name of the method
-    """
     __slots__ = ("comments", "return_type", "method_name")
 
     def __init__(self):
@@ -39,55 +57,84 @@ class method:
         self.return_type = ""
         self.method_name = ""
 
-    def get_method_text(self):
-        """
-            Returns the method text in this format:
-            /**
-             * self.comments
-             */
-             public self.return_type self.method_name {
-                //Body
-            }
-        """
-        return self.comments + "\n\tpublic " + self.return_type + " " + self.method_name + " {" + "\n\t\t" + "//Body" + "\n\t" + "}"
+    """
+        method __str__(self)
 
+        Returns the method text in this format:
+        /**
+         * self.comments
+         */
+         public self.return_type self.method_name {
+            //Body
+        }
+    """        
     def __str__(self):
-        return self.get_method_text()
+       return self.comments + "\n\tpublic " + self.return_type + " " + self.method_name + " {" + "\n\t\t" + "//Body" + "\n\t" + "}"
 
+"""
+    class static_field
+
+    Stores a single static field of a class for later printing
+    
+    slots:
+        comment - the comments from the javadoc about the method
+        instance_type - the type of the static variable
+        name - the name of the variable
+"""
 class static_field:
-    """
-        Stores a single static field of a class for later printing
-        
-        slots:
-            comment - the comments from the javadoc about the method
-            instance_type - the type of the static variable
-            name - the name of the variable
-    """
     __slots__ = ("comment","instance_type","name")
  
     def __init__(self):
         self.instance_type = ""
         self.name = ""
 
+    """
+        method __str__(self)
+
+        Returns the field as a string in this format:
+        //comment
+        self.instance_type self.name
+    """
     def __str__(self):
-        """
-            Returns the field in this format:
-            //comment
-            self.instance_type self.name
-        """
         return "\t" + self.instance_type + " " + self.name + "\n";
 
+"""
+    class writen_class
+
+    Stores class for later printing
+
+    slots:
+        head_text - the name of the method along with what it implements and extends
+        methods - a python list filled with type method used to store the methods of this class
+        fields - a python list filled with type fields used to store the static fields of this class
+"""
 class written_class:
-    __slots__ = ("head_text", "methods", "fields")
+    __slots__ = ("comment","head_text", "methods", "fields")
 
     def __init__(self):
         self.head_text = ""
         self.methods = list()
         self.fields = list()
+        self.comment = comment()
 
+    """
+        method __str__(self)
+
+        Returns the class as a string in the format:
+        class self.head_text + {
+            print_fields( self.fields )
+
+            print_methods( self.methods )
+        }
+    """
     def __str__(self):
         return "class " + self.head_text + " {\n\n" + print_fields( self.fields ) + "\n\n" +  print_methods( self.methods )  + "\n}"
 
+"""
+    method find_methods_summary
+
+    Searches through the methods summary section of the JavaDoc and returns a list of methods without comments
+"""
 def find_methods_summary( html_summary ):
     method_list = list()
     for table_row in html_summary.find_all("tr"):
