@@ -4,6 +4,46 @@
 		"selected_items":
 		[
 			[
+				"methods",
+				"methods_list"
+			],
+			[
+				"method",
+				"method_details"
+			],
+			[
+				"comment",
+				"comments"
+			],
+			[
+				"new",
+				"new_comment"
+			],
+			[
+				"comm",
+				"comment_text"
+			],
+			[
+				"clean",
+				"clean_string"
+			],
+			[
+				"field",
+				"field_summary"
+			],
+			[
+				"stat",
+				"static_field"
+			],
+			[
+				"met",
+				"methods_list"
+			],
+			[
+				"find_meth",
+				"find_methods_details"
+			],
+			[
 				"text",
 				"text-align"
 			],
@@ -280,10 +320,6 @@
 				"unused_project_list_index"
 			],
 			[
-				"new",
-				"new_project_list"
-			],
-			[
 				"unused",
 				"unused_project_list_item"
 			],
@@ -344,23 +380,31 @@
 	"buffers":
 	[
 		{
-			"file": "ReverseDoc.sublime-project",
-			"settings":
-			{
-				"buffer_size": 270,
-				"line_ending": "Unix"
-			}
-		},
-		{
 			"file": "ReverseDoc.py",
 			"settings":
 			{
-				"buffer_size": 939,
+				"buffer_size": 8222,
 				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "/C/Users/Hazel User/AppData/Roaming/Sublime Text 2/Packages/User/Python.sublime-settings",
+			"settings":
+			{
+				"buffer_size": 60,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "ReverseDoc.sublime-project",
+			"settings":
+			{
+				"buffer_size": 299,
+				"line_ending": "Unix"
 			}
 		}
 	],
-	"build_system": "",
+	"build_system": "CarRadio",
 	"command_palette":
 	{
 		"height": 392.0,
@@ -476,6 +520,16 @@
 	},
 	"file_history":
 	[
+		"/C/Users/Hazel User/Dropbox/Programming/Web/mikelyons/main.css",
+		"/C/Users/Hazel User/Dropbox/Programming/Web/mikelyons/index.php",
+		"/C/Users/Hazel User/Documents/GitHub/Reverse-Javadoc/index.php",
+		"/C/Users/Hazel User/Documents/GitHub/Reverse-Javadoc/test.java",
+		"/C/Users/Hazel User/Documents/GitHub/Reverse-Javadoc/test.txt",
+		"/C/Users/Hazel User/AppData/Roaming/Sublime Text 2/Packages/User/JSON.sublime-settings",
+		"/C/Users/Hazel User/AppData/Roaming/Sublime Text 2/Packages/User/Python.sublime-settings",
+		"/C/Users/Hazel User/Documents/GitHub/Reverse-Javadoc/method.py",
+		"/C/Users/Hazel User/Documents/GitHub/Reverse-Javadoc/ReverseDoc.sublime-project",
+		"/C/Users/Hazel User/Documents/GitHub/Reverse-Javadoc/ReverseDoc.py",
 		"/C/Users/Hazel User/Documents/GitHub/mgmt/mgmt-lyons.sublime-project",
 		"/C/Program Files (x86)/World of Warcraft/Interface/AddOns/ElvUI/core/animation.lua",
 		"/C/Users/Hazel User/Dropbox/Programming/Web/mikelyons/test.css",
@@ -575,23 +629,51 @@
 	"groups":
 	[
 		{
-			"selected": 1,
+			"selected": 2,
 			"sheets":
 			[
 				{
 					"buffer": 0,
-					"file": "ReverseDoc.sublime-project",
+					"file": "ReverseDoc.py",
 					"settings":
 					{
-						"buffer_size": 270,
+						"buffer_size": 8222,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								134,
-								134
+								1916,
+								1916
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Python/Python.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 585.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"file": "/C/Users/Hazel User/AppData/Roaming/Sublime Text 2/Packages/User/Python.sublime-settings",
+					"settings":
+					{
+						"buffer_size": 60,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								60,
+								60
 							]
 						],
 						"settings":
@@ -605,26 +687,25 @@
 					"type": "text"
 				},
 				{
-					"buffer": 1,
-					"file": "ReverseDoc.py",
+					"buffer": 2,
+					"file": "ReverseDoc.sublime-project",
 					"settings":
 					{
-						"buffer_size": 939,
+						"buffer_size": 299,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								351,
-								351
+								293,
+								293
 							]
 						],
 						"settings":
 						{
-							"syntax": "Packages/Python/Python.tmLanguage",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true
+							"syntax": "Packages/JavaScript/JSON.tmLanguage",
+							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
 						"translation.y": 0.0,
@@ -668,7 +749,7 @@
 	"menu_visible": true,
 	"output.exec":
 	{
-		"height": 217.0
+		"height": 381.0
 	},
 	"replace":
 	{
