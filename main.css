@@ -1,0 +1,127 @@
+body
+{
+	/* font-family: 'Fjalla One', sans-serif; */
+	font-family: 'Shanti', sans-serif;
+	background: url('dvsup.png');
+	background-repeat: repeat;
+	color: #FFF;
+	text-rendering: optimizeLegibility;
+
+	display: block;
+	position: relative;
+}
+b
+{
+	font-weight: bold;
+}
+#body
+{
+	padding: 0px;
+	width: 960px;
+	margin: 0 auto;
+}
+.title
+{
+	font-size: 20px;
+	text-align: left;
+	padding: 5px;
+}
+#menu_area
+{
+	min-height: 30px;
+	width: inherit;
+	background: #333333;
+	color: white;
+}
+#name
+{
+	float: left;
+}
+#dash
+{
+	padding: 0px 5px 0px 5px;
+}
+
+#menu
+{
+	float: right;
+	padding: 5px;
+}
+.nav_link, .nav_link:visited
+{
+	font-size: 20px;
+	text-align: right;
+
+	padding: 5px;
+
+	text-decoration: none;
+	color: white;
+}
+.nav_link:hover
+{
+	color: gray;
+	cursor: pointer;
+}
+.nav_link_selected
+{
+	background: orange;
+}
+.nav_link_selected:hover
+{
+	color: white;
+}
+
+#content_area
+{
+	margin: 5px 0px 0px 0px;
+	background: #333333;
+	width: inherit;
+}
+
+#main_content
+{
+	background: #333333;
+}
+
+.content
+{
+	padding: 5px 10px 5px 10px;
+	line-height: 150%;
+}
+
+#footer
+{
+	font-size: 10px;
+	text-align: center;
+	position: relative;
+	padding:5px;
+}
+
+.color2
+{
+	background: #086d07;
+}
+
+#technical
+{
+	
+}
+
+#i:hover
+{
+	cursor: pointer;
+}
+
+#ibox
+{
+	display: none;
+	text-align: center;
+	font-size:50px;
+}
+
+.content_list
+{
+	padding-left: 20px;
+	list-style-type:circle;
+	list-style-position:inside;
+}
