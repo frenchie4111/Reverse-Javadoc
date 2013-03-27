@@ -128,7 +128,7 @@ class written_class:
         }
     """
     def __str__(self):
-        return "class " + self.head_text + " {\n\n" + str_list( self.fields ) + "\n\n" +  str_list( self.methods )  + "\n}"
+        return "" + self.head_text + " {\n\n" + str_list( self.fields ) + "\n\n" +  str_list( self.methods )  + "\n}"
 
 """
     method find_methods_summary
