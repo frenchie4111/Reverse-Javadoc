@@ -181,7 +181,7 @@ def create_comment( comment_text ):
     new_comment.comment_type = "block"
 
     for line in comment_text.split("\n"):
-        new_comment.comment_lines.append( clean_string( line ).replace("Returns:", "@returns: ") )
+        new_comment.comment_lines.append( clean_string( line ).replace("Returns:", "@return: ") )
 
     return new_comment
 
