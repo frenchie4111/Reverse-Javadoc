@@ -2,8 +2,7 @@
 from bs4 import BeautifulSoup
 
 
-
-class comment():
+class Comment():
     """
     class comment
 
@@ -13,10 +12,9 @@ class comment():
         comment_type - The type of comment. Either "line" or "block"
         comment_lines - The lines of the comment. If comment_type==line then comment_lines should only have one index
 """
-    __slots__ = ("comment_type", "comment_lines")
 
-    def __init__(self):
-        self.comment_type = ""
+    def __init__(self, indent):
+        self.indent = indent
         self.comment_lines = list()
 
 
@@ -28,36 +26,38 @@ class comment():
             /**
              * self.comment_lines
              */
-        if comment_type is "line" reutrns comment string in format:
+        if comment_type is "line" returns comment string in format:
             # self.comment_lines[0]
         """
-        if (self.comment_type == "block"):
+        if self.indent:
             new_str = "\t/**\n"
             for comment_line in self.comment_lines:
                 new_str += "\t * " + comment_line + "\n"
             new_str += "\t */\n"
-            return new_str
-        if (self.comment_type == "line"):
-            new_str = "\t# " + self.comment_lines[0];
-        return ""
+        else:
+            new_str = "/**\n"
+            for comment_line in self.comment_lines:
+                new_str += " * " + comment_line + "\n"
+            new_str += " */\n"
+        return new_str
 
 
-class class_name():
-
+class ClassName():
     def __init__(self):
-        self.comments = comment()
+        self.comments = ""
+        # self.comments.header = True
         self.public = True
         self.title = ""
 
     def __repr__(self):
         if self.public:
-            class_type = "\tpublic"
+            class_type = "public"
         else:
-            class_type = "\tprivate"
+            class_type = "private"
         return str(self.comments) + class_type + " " + str(self.title)
 
 
-class method():
+class Method():
     """
     class method
 
@@ -68,12 +68,12 @@ class method():
         return_type - the type it returns
         method_name - the name of the method
 """
-    __slots__ = ("comments", "return_type", "name")
 
     def __init__(self):
-        self.comments = comment()
-        self.return_type = ""
+        self.comments = ""
+        self.instance_type = ""
         self.name = ""
+        self.return_type = ""
 
 
     def __repr__(self):
@@ -88,11 +88,15 @@ class method():
             //Body
         }
         """
-        return str(
-            self.comments) + "\tpublic " + self.return_type + " " + self.name + " {" + "\n\t\t" + "//TODO Add method body for " + self.name + "\n\t" + "}\n\n"
+        # if self.public:
+        # class_type = "public"
+        # else:
+        # class_type = "private"
+        return str(self.comments) + "\t" + self.instance_type + " " + self.return_type + " " + self.name + \
+               " {" + "\n\t\t" + "//TODO Add method body for " + self.name + "\n\t" + "}\n\n"
 
 
-class static_field():
+class StaticField():
     """
     class static_field
 
@@ -103,10 +107,10 @@ class static_field():
         instance_type - the type of the static variable
         name - the name of the variable
 """
-    __slots__ = ("comments", "instance_type", "name")
 
     def __init__(self):
-        self.comments = comment()
+        self.comments = ""
+        # self.comments.header = False
         self.instance_type = ""
         self.name = ""
 
@@ -119,10 +123,10 @@ class static_field():
         //comment
         self.instance_type self.name
     """
-        return str(self.comments) + self.instance_type + " " + self.name + "\n";
+        return str(self.comments) + "\t" + self.instance_type + " " + self.name + ";\n\n"
 
 
-class written_class(object):
+class WrittenClass(object):
     """
     class writen_class
 
@@ -133,7 +137,6 @@ class written_class(object):
         methods - a python list filled with type method used to store the methods of this class
         fields - a python list filled with type fields used to store the static fields of this class
     """
-    __slots__ = ("head_text", "methods", "fields")
 
     def __init__(self):
         self.head_text = ""
@@ -154,6 +157,22 @@ class written_class(object):
     """
         return "" + str(self.head_text) + " {\n\n" + str_list(self.fields) + "\n\n" + str_list(self.methods) + "\n}"
 
+def create_comment(comment_text, indent):
+    """
+    method create_comment
+
+    Creates a comment object from a given string
+
+    Arguments:
+        comment_text - the text to be in the comment
+"""
+    new_comment = Comment(indent)
+
+    for line in comment_text.split("\n"):
+        new_comment.comment_lines.append(str(line).replace("Returns:", "@return: "))
+
+    return new_comment
+
 
 def find_methods_summary(html_summary):
     """
@@ -167,9 +186,9 @@ def find_methods_summary(html_summary):
     method_list = list()
     for table_row in html_summary.find_all("tr"):
         if table_row.text.strip() != "Method Summary":
-            current_method = method()
+            current_method = Method()
             for table_code in table_row.find_all("code", recursive="true"):
-                if ( current_method.return_type == "" ):
+                if current_method.return_type == "":
                     current_method.return_type = table_code.text.strip().replace(u'\xa0', u' ')
                 else:
                     current_method.name = table_code.text.strip().replace(u'\xa0', u' ')
@@ -189,26 +208,8 @@ def find_methods_details(methods_list, soup):
     for method in methods_list:
         method_details = soup.find("a", {"name": method.name}, recursive="true")
         if method_details:
-            method.comments = create_comment(str(method_details.findNext("dl").text))
+            method.comments = create_comment(str(method_details.findNext("dl").text), True)
 
-
-def create_comment(comment_text):
-    """
-    method create_comment
-
-    Creates a comment object from a given string
-
-    Arguments:
-        comment_text - the text to be in the comment
-"""
-    new_comment = comment()
-
-    new_comment.comment_type = "block"
-
-    for line in comment_text.split("\n"):
-        new_comment.comment_lines.append(str(line).replace("Returns:", "@return: "))
-
-    return new_comment
 
 
 def find_methods(soup):
@@ -218,11 +219,25 @@ def find_methods(soup):
     Finds all of the methods and then all of their comments and returns a list containing them
     """
     methods_list = list()
-    method.summary = soup.find("a", {"name": "method.summary"}, recursive="true").findNext("table")
-    if method.summary:
-        method_list = find_methods_summary(method.summary)
-        find_methods_details(method_list, soup)
+    summary = soup.find("a", {"name": "method.summary"}, recursive="true").findNext("table")
+    method_list = list()
+    for table_row in summary.find_all("tr"):
+        if table_row.text.strip() != "Method Summary":
+            current_method = Method()
+            for table_code in table_row.find_all("code", recursive="true"):
+                if current_method.return_type == "":
+                    current_method.return_type = table_code.text.strip().replace(u'\xa0', u' ')
+                else:
+                    current_method.name = table_code.text.strip().replace(u'\xa0', u' ')
+            method_list.append(current_method)
+    find_methods_details(method_list, soup)
     return method_list
+
+
+def find_fields_details(fields_list, soup):
+    for field in fields_list:
+        field_details = soup.find("a", {"name": field.name})
+        field.comments = create_comment(str(field_details.findNext("div", {"class": "block"}).text), True)
 
 
 def find_fields(soup):
@@ -233,19 +248,15 @@ def find_fields(soup):
     """
     fields_list = list()
     field_summary = soup.find("a", {"name": "field.summary"}, recursive="true")
-    if ( field_summary ):
-        for table_row in field_summary.findNext("table").find_all("tr", recursive="true"):
-            if ( table_row.text.strip() != "Field Summary" ):
-                new_field = static_field()
-                for table_code in table_row.find_all("code", recursive="true"):
-                    print(table_code)
-                    if ( new_field.instance_type == "" ):
-                        new_field.instance_type = str(table_code.text)
-                    else:
-                        new_field.name = str(table_code.text)
-
-                fields_list.append(new_field)
-    find_methods_details(fields_list, soup)
+    for table_row in field_summary.findNext("table").find_all("tr", recursive="true"):
+        new_field = StaticField()
+        for table_code in table_row.find_all("code", recursive="true"):
+            if new_field.instance_type == "":
+                new_field.instance_type = str(table_code.text)
+            else:
+                new_field.name = str(table_code.text)
+        fields_list.append(new_field)
+    find_fields_details(fields_list, soup)
     return fields_list
 
 
@@ -266,12 +277,12 @@ def str_list(pyList):
 
 # def clean_string(string):
 # """
-#     method clean_string
+# method clean_string
 #
-#     Cleans a string of unicode characters and newlines
+# Cleans a string of unicode characters and newlines
 #
-#     Arguments:
-#         string - string to be cleaned and returned
+# Arguments:
+# string - string to be cleaned and returned
 # """
 #     return string.strip().replace(u'\xa0', u' ')
 
@@ -282,12 +293,12 @@ def find_class_name(soup):
 
     finds a returns the name of the class on the page
 """
-    my_class = class_name()
+    my_class = ClassName()
     class_header = str(soup.find("pre").text).split('\n')[0].split()
     my_class.title = class_header[-1]
     if class_header[0] == "private":
         my_class.public = False
-    my_class.comments = create_comment(str(soup.find("div", {"class": "block"}).text))
+    my_class.comments = create_comment(str(soup.find("div", {"class": "block"}).text), False)
     return my_class
 
 
@@ -300,7 +311,7 @@ def ReverseDoc(html):
     Arguments:
         html - the pages html
 """
-    my_class = written_class()
+    my_class = WrittenClass()
     soup = BeautifulSoup(html)
     my_class.head_text = find_class_name(soup)
     my_class.fields = find_fields(soup)
@@ -311,7 +322,6 @@ def ReverseDoc(html):
 def main():
     # html_file = input("File to be reversed: ")
     htmlfile = "./tests/Dragster.html"
-    # htmlfile = urllib.urlopen("/home/andrew/temp/Reverse-Javadoc/tests/Dragster.html")
     with open(htmlfile) as f:
         htmltext = f.read()
     java = ReverseDoc(htmltext)

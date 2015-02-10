@@ -11,6 +11,15 @@ def clean_string(string):
 """
     return string.strip().replace(u'\xa0', u' ')
 
+def find_fields(soup):
+    field_summary = soup.find("a", {"name": "field.summary"}, recursive="true")
+    if ( field_summary ):
+        for table_row in field_summary.findNext("table").find_all("tr", recursive="true"):
+            for table_code in table_row.find_all("code", recursive="true"):
+                print(table_code.text)
+                print()
+
+
 def ReverseDoc(html):
     """
     method ReverseDoc
@@ -22,7 +31,7 @@ def ReverseDoc(html):
 """
     # my_class = written_class()
     soup = BeautifulSoup(html)
-    print(str(soup.find("a", {"name": "field.detail"}, recursive="true")))
+    find_fields(soup)
 
 
 def main():
