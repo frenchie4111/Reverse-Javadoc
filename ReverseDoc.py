@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 from bs4 import BeautifulSoup
-import re
+import sys
 import ClassName
 import Fields
 import Method
@@ -155,9 +155,10 @@ def ReverseDoc(html):
 
 
 def main():
-    # html_file = input("File to be reversed: ")
-    # htmlfile = "./tests/Dragster.html"
-    htmlfile = "./tests/Dragster.html"
+    if len(sys.argv) > 1:
+        htmlfile = sys.argv[1]
+    else:
+        htmlfile = input("Enter file name with path: ")
     with open(htmlfile) as f:
         htmltext = f.read()
     java = ReverseDoc(htmltext)
