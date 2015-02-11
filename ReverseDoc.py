@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 from bs4 import BeautifulSoup
+import re
 
 
 class Comment():
@@ -33,12 +34,12 @@ class Comment():
             new_str = "\t/**\n"
             for comment_line in self.comment_lines:
                 new_str += "\t * " + comment_line + "\n"
-            new_str += "\t */\n"
+            # new_str += "\t */\n"
         else:
             new_str = "/**\n"
             for comment_line in self.comment_lines:
                 new_str += " * " + comment_line + "\n"
-            new_str += " */\n"
+            # new_str += " */\n"
         return new_str
 
 
@@ -54,7 +55,7 @@ class ClassName():
             class_type = "public"
         else:
             class_type = "private"
-        return str(self.comments) + class_type + " " + str(self.title)
+        return str(self.comments) + " */\n" + class_type + " " + str(self.title)
 
 
 class Method():
@@ -71,9 +72,12 @@ class Method():
 
     def __init__(self):
         self.comments = ""
-        self.instance_type = ""
+        # self.instance_type = ""
         self.name = ""
         self.return_type = ""
+        self.sig = ""
+        self.parameters = ""
+        self.returns = ""
 
 
     def __repr__(self):
@@ -92,7 +96,10 @@ class Method():
         # class_type = "public"
         # else:
         # class_type = "private"
-        return str(self.comments) + "\t" + self.instance_type + " " + self.return_type + " " + self.name + \
+        if self.return_type.find("private") == -1:
+            self.return_type = "public " + self.return_type
+
+        return str(self.comments) + "\t */\n" + "\t" + self.return_type + " " + self.name + \
                " {" + "\n\t\t" + "//TODO Add method body for " + self.name + "\n\t" + "}\n\n"
 
 
@@ -123,7 +130,7 @@ class StaticField():
         //comment
         self.instance_type self.name
     """
-        return str(self.comments) + "\t" + self.instance_type + " " + self.name + ";\n\n"
+        return str(self.comments) + "\t */\n "+ "\t" + self.instance_type + " " + self.name + ";\n\n"
 
 
 class WrittenClass(object):
@@ -169,31 +176,10 @@ def create_comment(comment_text, indent):
     new_comment = Comment(indent)
 
     for line in comment_text.split("\n"):
-        new_comment.comment_lines.append(str(line).replace("Returns:", "@return: "))
+        new_comment.comment_lines.append(str(line).replace("Returns:", "@return "))
 
     return new_comment
 
-
-def find_methods_summary(html_summary):
-    """
-    method find_methods_summary
-
-    Searches through the methods summary section of the JavaDoc and returns a list of methods without comments
-
-    Arguments:
-        html_summary - BeautifulSoup string of just the method summary area
-"""
-    method_list = list()
-    for table_row in html_summary.find_all("tr"):
-        if table_row.text.strip() != "Method Summary":
-            current_method = Method()
-            for table_code in table_row.find_all("code", recursive="true"):
-                if current_method.return_type == "":
-                    current_method.return_type = table_code.text.strip().replace(u'\xa0', u' ')
-                else:
-                    current_method.name = table_code.text.strip().replace(u'\xa0', u' ')
-            method_list.append(current_method)
-    return method_list
 
 
 def find_methods_details(methods_list, soup):
@@ -206,9 +192,19 @@ def find_methods_details(methods_list, soup):
         methods_list - list of all of the methods
     """
     for method in methods_list:
-        method_details = soup.find("a", {"name": method.name}, recursive="true")
-        if method_details:
-            method.comments = create_comment(str(method_details.findNext("dl").text), True)
+        method_details = soup.find("a", {"name": re.compile(method.name.split("(")[0])})
+        method.comments = create_comment(str(method_details.findNext("div", {"class": "block"}).text), True)
+        method_parameters = method_details.findNext("dl")
+        method_parameters = method_parameters.find_all("span", {"class": "paramLabel"})
+        method_returns = method_details.findNext("span", {"class": "returnLabel"})
+        if method_parameters:
+            for parameter in method_parameters:
+                parameters_list = list()
+                parameters_list.append([parameter.findNext("dd").text.split("-")[0].strip(),
+                                        parameter.findNext("dd").text.split("-")[1].strip()])
+            method.parameters = parameters_list
+        if method_returns:
+            method.returns = method_returns.findNext("dd").text
 
 
 
@@ -218,11 +214,10 @@ def find_methods(soup):
 
     Finds all of the methods and then all of their comments and returns a list containing them
     """
-    methods_list = list()
-    summary = soup.find("a", {"name": "method.summary"}, recursive="true").findNext("table")
     method_list = list()
+    summary = soup.find("a", {"name": "method.summary"}, recursive="true").findNext("table")
     for table_row in summary.find_all("tr"):
-        if table_row.text.strip() != "Method Summary":
+        if table_row.text.strip() != "Modifier and Type\nMethod and Description":
             current_method = Method()
             for table_code in table_row.find_all("code", recursive="true"):
                 if current_method.return_type == "":
@@ -230,6 +225,7 @@ def find_methods(soup):
                 else:
                     current_method.name = table_code.text.strip().replace(u'\xa0', u' ')
             method_list.append(current_method)
+    # print(method_list)
     find_methods_details(method_list, soup)
     return method_list
 
@@ -249,13 +245,14 @@ def find_fields(soup):
     fields_list = list()
     field_summary = soup.find("a", {"name": "field.summary"}, recursive="true")
     for table_row in field_summary.findNext("table").find_all("tr", recursive="true"):
-        new_field = StaticField()
-        for table_code in table_row.find_all("code", recursive="true"):
-            if new_field.instance_type == "":
-                new_field.instance_type = str(table_code.text)
-            else:
-                new_field.name = str(table_code.text)
-        fields_list.append(new_field)
+        if table_row.text.strip() != "Modifier and Type\nField and Description":
+            new_field = StaticField()
+            for table_code in table_row.find_all("code", recursive="true"):
+                if new_field.instance_type == "":
+                    new_field.instance_type = str(table_code.text)
+                else:
+                    new_field.name = str(table_code.text)
+            fields_list.append(new_field)
     find_fields_details(fields_list, soup)
     return fields_list
 
