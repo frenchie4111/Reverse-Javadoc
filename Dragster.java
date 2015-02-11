@@ -44,21 +44,43 @@ public Dragster {
 
 
 
+	/**
+	 * Function to "burn out" the dragster tires just prior to racing.
+	 *  Sets the traction as a result of "burning out" the tires.
+	 * 
+	 *  traction = traction * burnFactor
+	 * 
+	 *  Where burnFactor is the value returned from conditionTires().
 	 */
 	public void burnout() {
 		//TODO Add method body for burnout()
 	}
 
+	/**
+	 * Conditioning function to prepare tires for race
+	 * 
+	 *  2.5 * ( e^ -( (time * time - (10 * time) + 25) / 50 )  ) / sqrt( 2 * PI )
 	 */
 	private double conditionTires(double time) {
 		//TODO Add method body for conditionTires(double time)
 	}
 
+	/**
+	 * Perform the race. Calculates a race time. The race time will be determined
+	 *  by the following:
+	 *    reactionTime + ( 1 / ( (torque / TORQUE2TIME) * effectiveTraction ) )
 	 */
 	public double race() {
 		//TODO Add method body for race()
 	}
 
+	/**
+	 * Returns the following String representation of this Dragster object
+	 *  with the following format:
+	 * 
+	 *  Reaction Time: w Torque: x Traction: y Burn Time: z
+	 * 
+	 *  Where w, x, y, and z are the reactionTime, torque, traction and burnTime
 	 */
 	public java.lang.String toString() {
 		//TODO Add method body for toString()

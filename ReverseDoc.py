@@ -102,6 +102,14 @@ class Method():
         return str(self.comments) + "\t */\n" + "\t" + self.return_type + " " + self.name + \
                " {" + "\n\t\t" + "//TODO Add method body for " + self.name + "\n\t" + "}\n\n"
 
+class Constructor():
+    def __init__(self):
+        self.sig = ""
+        self.comments = ""
+        self.parameters = list()
+
+    def __repr__(self):
+        return str(self.comments) + parameter_print(self.parameters) + "\t */\n" + "\t" + self.sig
 
 class StaticField():
     """
@@ -149,6 +157,7 @@ class WrittenClass(object):
         self.head_text = ""
         self.methods = list()
         self.fields = list()
+        self.constructor = ""
 
 
     def __str__(self):
@@ -163,6 +172,27 @@ class WrittenClass(object):
         }
     """
         return "" + str(self.head_text) + " {\n\n" + str_list(self.fields) + "\n\n" + str_list(self.methods) + "\n}"
+
+def parameter_print(parameter_list):
+    new_list = list()
+    for parameter in parameter_list:
+        new_list.append("\t * @param " + parameter[0] + parameter[1] + "\n")
+    return str_list(new_list)
+
+def str_list(pyList):
+    """
+    method str_list
+
+    Return a string containing the str( ) of the items in the given pyList
+
+    Arguments:
+        pyList - python list to be converted to string
+"""
+    new_str = ""
+    for list_item in pyList:
+        new_str += str(list_item)
+    return new_str
+
 
 def create_comment(comment_text, indent):
     """
@@ -194,19 +224,18 @@ def find_methods_details(methods_list, soup):
     for method in methods_list:
         method_details = soup.find("a", {"name": re.compile(method.name.split("(")[0])})
         method.comments = create_comment(str(method_details.findNext("div", {"class": "block"}).text), True)
-        method_parameters = method_details.findNext("dl")
-        method_parameters = method_parameters.find_all("span", {"class": "paramLabel"})
+        # method_parameters = method_details.findNext("dl")
+        method_parameters = method_parameters.findNext("span", {"class": "paramLabel"})
         method_returns = method_details.findNext("span", {"class": "returnLabel"})
-        if method_parameters:
-            for parameter in method_parameters:
+        if method_parameters: #.findNext("span", {"class": "paramLabel"}):
+            for parameter in method_parameters.find_all("dd"):
                 parameters_list = list()
-                parameters_list.append([parameter.findNext("dd").text.split("-")[0].strip(),
-                                        parameter.findNext("dd").text.split("-")[1].strip()])
+                print(parameter.text)
+                parameters_list.append([parameter.text.split("-", 1)[0].strip(),
+                                        parameter.text.split("-", 1)[1].strip()])
             method.parameters = parameters_list
         if method_returns:
             method.returns = method_returns.findNext("dd").text
-
-
 
 def find_methods(soup):
     """
@@ -221,11 +250,10 @@ def find_methods(soup):
             current_method = Method()
             for table_code in table_row.find_all("code", recursive="true"):
                 if current_method.return_type == "":
-                    current_method.return_type = table_code.text.strip().replace(u'\xa0', u' ')
+                    current_method.return_type = str(table_code.text).strip()
                 else:
-                    current_method.name = table_code.text.strip().replace(u'\xa0', u' ')
+                    current_method.name = " ".join(str(table_code.text).replace("\n", "").split())
             method_list.append(current_method)
-    # print(method_list)
     find_methods_details(method_list, soup)
     return method_list
 
@@ -236,6 +264,7 @@ def find_fields_details(fields_list, soup):
         field.comments = create_comment(str(field_details.findNext("div", {"class": "block"}).text), True)
 
 
+
 def find_fields(soup):
     """
     method find_fields
@@ -244,18 +273,34 @@ def find_fields(soup):
     """
     fields_list = list()
     field_summary = soup.find("a", {"name": "field.summary"}, recursive="true")
-    for table_row in field_summary.findNext("table").find_all("tr", recursive="true"):
-        if table_row.text.strip() != "Modifier and Type\nField and Description":
-            new_field = StaticField()
-            for table_code in table_row.find_all("code", recursive="true"):
-                if new_field.instance_type == "":
-                    new_field.instance_type = str(table_code.text)
-                else:
-                    new_field.name = str(table_code.text)
-            fields_list.append(new_field)
-    find_fields_details(fields_list, soup)
+    if field_summary:
+        for table_row in field_summary.findNext("table").find_all("tr", recursive="true"):
+            if table_row.text.strip() != "Modifier and Type\nField and Description":
+                new_field = StaticField()
+                for table_code in table_row.find_all("code", recursive="true"):
+                    if new_field.instance_type == "":
+                        new_field.instance_type = str(table_code.text)
+                    else:
+                        new_field.name = str(table_code.text)
+                fields_list.append(new_field)
+        find_fields_details(fields_list, soup)
     return fields_list
 
+
+def find_constructor(soup):
+    constructor = soup.find("a", {"name": "constructor.detail"}, recursive="true")
+    if constructor:
+        new_constructor = Constructor()
+        new_constructor.sig = " ".join(str(constructor.findNext("pre").text).replace("\n", "").split())
+        constructor.findNext("dl").find_all()
+        constructor_parameters = constructor.findNext("dl")
+        if constructor_parameters:
+            for parameter in constructor_parameters.find_all("dd"):
+                parameters_list = list()
+                parameters_list.append([parameter.text.split("-", 1)[0].strip(),
+                                        parameter.text.split("-", 1)[1].strip()])
+            new_constructor.parameters = parameters_list
+        return new_constructor
 
 def str_list(pyList):
     """
@@ -270,18 +315,6 @@ def str_list(pyList):
     for list_item in pyList:
         new_str += str(list_item)
     return new_str
-
-
-# def clean_string(string):
-# """
-# method clean_string
-#
-# Cleans a string of unicode characters and newlines
-#
-# Arguments:
-# string - string to be cleaned and returned
-# """
-#     return string.strip().replace(u'\xa0', u' ')
 
 
 def find_class_name(soup):
@@ -313,11 +346,13 @@ def ReverseDoc(html):
     my_class.head_text = find_class_name(soup)
     my_class.fields = find_fields(soup)
     my_class.methods = find_methods(soup)
+    my_class.constructor = find_constructor(soup)
     return my_class
 
 
 def main():
     # html_file = input("File to be reversed: ")
+    # htmlfile = "./tests/Dragster.html"
     htmlfile = "./tests/Dragster.html"
     with open(htmlfile) as f:
         htmltext = f.read()
@@ -326,7 +361,7 @@ def main():
     javaTitle = java.head_text.title
     with open(javaTitle + ".java", "w") as f:
         f.write(str(java))
-        pass
+        # pass
         # print(java)
 
 
