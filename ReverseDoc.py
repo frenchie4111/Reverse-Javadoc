@@ -77,12 +77,13 @@ class WrittenClass(object):
             str_list( self.methods )
         }
     """
-        return "" + str(self.head_text) + " {\n\n" + str_list(self.fields) + "\n\n" + str_list(self.methods) + "\n}"
+        return "" + str(self.head_text) + " {\n\n" + str_list(self.fields) + "\n\n" + str(self.constructor) + "\n\n" + str_list(self.methods) + "\n}"
 
 def parameter_print(parameter_list):
     new_list = list()
     for parameter in parameter_list:
-        new_list.append("\t * @param " + parameter[0] + parameter[1] + "\n")
+        parameter[1] = " ".join(str(parameter[1]).replace("\n", "").split())
+        new_list.append("\t * @param " + parameter[0] + " " + parameter[1] + "\n")
     return str_list(new_list)
 
 def str_list(pyList):
@@ -115,14 +116,6 @@ def create_comment(comment_text, indent):
         new_comment.comment_lines.append(str(line).replace("Returns:", "@return "))
 
     return new_comment
-
-
-
-
-
-
-
-
 
 
 
@@ -164,7 +157,7 @@ def ReverseDoc(html):
 def main():
     # html_file = input("File to be reversed: ")
     # htmlfile = "./tests/Dragster.html"
-    htmlfile = "./tests/PolyEval.html"
+    htmlfile = "./tests/Dragster.html"
     with open(htmlfile) as f:
         htmltext = f.read()
     java = ReverseDoc(htmltext)

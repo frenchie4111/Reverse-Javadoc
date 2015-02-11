@@ -13,7 +13,7 @@ class ClassName():
             class_type = "public"
         else:
             class_type = "private"
-        return str(self.comments) + " */\n" + class_type + " " + str(self.title)
+        return str(self.comments) + "\n */\n" + class_type + " " + str(self.title)
 
 
 

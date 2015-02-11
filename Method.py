@@ -34,15 +34,14 @@ class Method():
             //Body
         }
         """
-        # if self.public:
-        # class_type = "public"
-        # else:
-        # class_type = "private"
+        if self.returns:
+            self.returns = " ".join(str(self.returns).replace("\n", "").split())
         if self.return_type.find("private") == -1:
             self.return_type = "public " + self.return_type
 
-        return str(self.comments) + "\t */\n" + "\t" + self.return_type + " " + self.name + \
-               " {" + "\n\t\t" + "//TODO Add method body for " + self.name + "\n\t" + "}\n\n"
+        return str(self.comments) + ReverseDoc.parameter_print(self.parameters) + "\t * @return " + str(self.returns) + \
+               "\n\t */\n" + "\t" + self.return_type + " " + self.name + " {" + "\n\t\t" + \
+               "//TODO Add method body for " + self.name + "\n\t" + "}\n\n"
 
 
 def find_methods_details(methods_list, soup):
@@ -66,7 +65,6 @@ def find_methods_details(methods_list, soup):
                                         parameter.text.split("-", 1)[1].strip()])
                 parameter = parameter.next_sibling.next_sibling
             method.parameters = parameters_list
-            print(method.name, method.parameters)
         method_returns = method_details.findNext("span", {"class": "returnLabel"})
         if method_returns:
             method.returns = method_returns.findNext("dd").text
