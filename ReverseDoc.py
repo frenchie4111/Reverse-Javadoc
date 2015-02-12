@@ -43,8 +43,9 @@ class Comment():
             new_str = "/**\n"
             for comment_line in self.comment_lines:
                 new_str += " * " + comment_line + "\n"
+
             # new_str += " */\n"
-        return new_str
+        return new_str[:len(new_str) - 1]
 
 
 class WrittenClass(object):
@@ -77,14 +78,26 @@ class WrittenClass(object):
             str_list( self.methods )
         }
     """
-        return "" + str(self.head_text) + " {\n\n" + str_list(self.fields) + "\n\n" + str(self.constructor) + "\n\n" + str_list(self.methods) + "\n}"
+        javaClass = str(self.head_text) + " {\n\n"
+        if self.fields:
+            javaClass += str(self.fields) + "\n\n"
+        if self.constructor:
+            javaClass += str(self.constructor) + "\n\n"
+        if self.methods:
+            javaClass += str_list(self.methods)
+        return javaClass + "\n}"
 
 def parameter_print(parameter_list):
     new_list = list()
     for parameter in parameter_list:
         parameter[1] = " ".join(str(parameter[1]).replace("\n", "").split())
         new_list.append("\t * @param " + parameter[0] + " " + parameter[1] + "\n")
-    return str_list(new_list)
+
+    parameters = str_list(new_list)
+    if parameters:
+        return "\n" + parameters[:len(parameters) - 1]
+    else:
+        return ""
 
 def str_list(pyList):
     """

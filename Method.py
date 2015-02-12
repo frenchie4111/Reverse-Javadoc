@@ -36,10 +36,12 @@ class Method():
         """
         if self.returns:
             self.returns = " ".join(str(self.returns).replace("\n", "").split())
+            self.returns = "\n\t * @return " + str(self.returns)
         if self.return_type.find("private") == -1:
             self.return_type = "public " + self.return_type
 
-        return str(self.comments) + ReverseDoc.parameter_print(self.parameters) + "\t * @return " + str(self.returns) + \
+
+        return str(self.comments) + ReverseDoc.parameter_print(self.parameters) + self.returns + \
                "\n\t */\n" + "\t" + self.return_type + " " + self.name + " {" + "\n\t\t" + \
                "//TODO Add method body for " + self.name + "\n\t" + "}\n\n"
 
@@ -55,12 +57,14 @@ def find_methods_details(methods_list, soup):
     """
     for method in methods_list:
         method_details = soup.find("a", {"name": re.compile(method.name.split("(")[0])})
-        method.comments = ReverseDoc.create_comment(str(method_details.findNext("div", {"class": "block"}).text), True)
+        comment = method_details.findNext("div", {"class": "block"})
+        if comment:
+            method.comments = ReverseDoc.create_comment(str(comment.text), True)
         method_parameters = method_details.findNext("span", {"class": "paramLabel"})
         if method_parameters:
             parameter = method_parameters.parent.next_sibling.next_sibling
             parameters_list = list()
-            while str(parameter).find("Returns:") == -1:
+            while str(parameter).find("Returns:") == -1 and parameter:
                 parameters_list.append([parameter.text.split("-", 1)[0].strip(),
                                         parameter.text.split("-", 1)[1].strip()])
                 parameter = parameter.next_sibling.next_sibling
