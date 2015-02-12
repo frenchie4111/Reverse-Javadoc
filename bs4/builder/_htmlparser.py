@@ -4,7 +4,7 @@ __all__ = [
     'HTMLParserTreeBuilder',
     ]
 
-from HTMLParser import (
+from html.parser import (
     HTMLParser,
     HTMLParseError,
     )
@@ -45,7 +45,15 @@ HTMLPARSER = 'html.parser'
 class BeautifulSoupHTMLParser(HTMLParser):
     def handle_starttag(self, name, attrs):
         # XXX namespace
-        self.soup.handle_starttag(name, None, None, dict(attrs))
+        attr_dict = {}
+        for key, value in attrs:
+            # Change None attribute values to the empty string
+            # for consistency with the other tree builders.
+            if value is None:
+                value = ''
+            attr_dict[key] = value
+            attrvalue = '""'
+        self.soup.handle_starttag(name, None, None, attr_dict)
 
     def handle_endtag(self, name):
         self.soup.handle_endtag(name)
@@ -58,13 +66,15 @@ class BeautifulSoupHTMLParser(HTMLParser):
         # it's fixed.
         if name.startswith('x'):
             real_name = int(name.lstrip('x'), 16)
+        elif name.startswith('X'):
+            real_name = int(name.lstrip('X'), 16)
         else:
             real_name = int(name)
 
         try:
-            data = unichr(real_name)
-        except (ValueError, OverflowError), e:
-            data = u"\N{REPLACEMENT CHARACTER}"
+            data = chr(real_name)
+        except (ValueError, OverflowError) as e:
+            data = "\N{REPLACEMENT CHARACTER}"
 
         self.handle_data(data)
 
@@ -85,6 +95,9 @@ class BeautifulSoupHTMLParser(HTMLParser):
         self.soup.endData()
         if data.startswith("DOCTYPE "):
             data = data[len("DOCTYPE "):]
+        elif data == 'DOCTYPE':
+            # i.e. "<!DOCTYPE>"
+            data = ''
         self.soup.handle_data(data)
         self.soup.endData(Doctype)
 
@@ -129,14 +142,15 @@ class HTMLParserTreeBuilder(HTMLTreeBuilder):
         declared within markup, whether any characters had to be
         replaced with REPLACEMENT CHARACTER).
         """
-        if isinstance(markup, unicode):
-            return markup, None, None, False
+        if isinstance(markup, str):
+            yield (markup, None, None, False)
+            return
 
         try_encodings = [user_specified_encoding, document_declared_encoding]
         dammit = UnicodeDammit(markup, try_encodings, is_html=True)
-        return (dammit.markup, dammit.original_encoding,
-                dammit.declared_html_encoding,
-                dammit.contains_replacement_characters)
+        yield (dammit.markup, dammit.original_encoding,
+               dammit.declared_html_encoding,
+               dammit.contains_replacement_characters)
 
     def feed(self, markup):
         args, kwargs = self.parser_args
@@ -144,7 +158,7 @@ class HTMLParserTreeBuilder(HTMLTreeBuilder):
         parser.soup = self.soup
         try:
             parser.feed(markup)
-        except HTMLParseError, e:
+        except HTMLParseError as e:
             warnings.warn(RuntimeWarning(
                 "Python's built-in HTMLParser cannot parse the given document. This is not a bug in Beautiful Soup. The best solution is to install an external parser (lxml or html5lib), and use Beautiful Soup with that parser. See http://www.crummy.com/software/BeautifulSoup/bs4/doc/#installing-a-parser for help."))
             raise e

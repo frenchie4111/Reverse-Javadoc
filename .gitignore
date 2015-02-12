@@ -2,3 +2,7 @@ temp.*
 dvsup.png
 *.css
 index.php.txt
+/__pycache__/
+*.pyc
+*.java
+*.html

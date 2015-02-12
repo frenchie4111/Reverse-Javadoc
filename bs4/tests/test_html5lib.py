@@ -5,7 +5,7 @@ import warnings
 try:
     from bs4.builder import HTML5TreeBuilder
     HTML5LIB_PRESENT = True
-except ImportError, e:
+except ImportError as e:
     HTML5LIB_PRESENT = False
 from bs4.element import SoupStrainer
 from bs4.testing import (
@@ -56,3 +56,30 @@ class HTML5LibBuilderSmokeTest(SoupTest, HTML5TreeBuilderSmokeTest):
             "<table><thead><tr><td>Foo</td></tr></thead>"
             "<tbody><tr><td>Bar</td></tr></tbody>"
             "<tfoot><tr><td>Baz</td></tr></tfoot></table>")
+
+    def test_xml_declaration_followed_by_doctype(self):
+        markup = '''<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html>
+  <head>
+  </head>
+  <body>
+   <p>foo</p>
+  </body>
+</html>'''
+        soup = self.soup(markup)
+        # Verify that we can reach the <p> tag; this means the tree is connected.
+        self.assertEqual(b"<p>foo</p>", soup.p.encode())
+
+    def test_reparented_markup(self):
+        markup = '<p><em>foo</p>\n<p>bar<a></a></em></p>'
+        soup = self.soup(markup)
+        self.assertEqual("<body><p><em>foo</em></p><em>\n</em><p><em>bar<a></a></em></p></body>", soup.body.decode())
+        self.assertEqual(2, len(soup.find_all('p')))
+
+
+    def test_reparented_markup_ends_with_whitespace(self):
+        markup = '<p><em>foo</p>\n<p>bar<a></a></em></p>\n'
+        soup = self.soup(markup)
+        self.assertEqual("<body><p><em>foo</em></p><em>\n</em><p><em>bar<a></a></em></p>\n</body>", soup.body.decode())
+        self.assertEqual(2, len(soup.find_all('p')))
