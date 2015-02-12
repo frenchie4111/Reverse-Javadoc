@@ -10,7 +10,7 @@ class Constructor():
     def __repr__(self):
         if self.parameters:
             for parameter in self.parameters:
-                self.body.append("\t\tself." + parameter[0] + " = " + parameter[0] + "\n")
+                self.body.append("\t\tthis." + parameter[0] + " = " + parameter[0] + "\n")
         else:
             self.body = ""
         if self.comments and self.parameters:

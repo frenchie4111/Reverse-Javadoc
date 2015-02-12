@@ -175,9 +175,8 @@ def main():
     with open(htmlfile) as f:
         htmltext = f.read()
     java = ReverseDoc(htmltext)
-    # print(str(java))
-    javaTitle = java.head_text.title
-    with open(javaTitle + ".java", "w") as f:
+    print(htmlfile.split("/")[-1].split(".")[0])
+    with open(htmlfile.split("/")[-1].split(".")[0] + ".java", "w") as f:
         f.write(str(java))
         # pass
         # print(java)

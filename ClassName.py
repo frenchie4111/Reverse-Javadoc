@@ -4,7 +4,6 @@ class ClassName():
 
     def __init__(self):
         self.comments = ""
-        # self.comments.header = True
         self.public = True
         self.title = ""
 
@@ -13,7 +12,7 @@ class ClassName():
             class_type = "public"
         else:
             class_type = "private"
-        return str(self.comments) + "\n */\n" + class_type + " " + str(self.title)
+        return str(self.comments) + "\n */\n" + str(self.title)
 
 
 
@@ -24,9 +23,7 @@ def find_class_name(soup):
     finds a returns the name of the class on the page
 """
     my_class = ClassName()
-    class_header = str(soup.find("pre").text).split('\n')[0].split()
-    my_class.title = class_header[-1]
-    if class_header[0] == "private":
-        my_class.public = False
+    print(soup.find("pre").text)
+    my_class.title = str(soup.find("pre").text).split('\n')[0]
     my_class.comments = ReverseDoc.create_comment(str(soup.find("div", {"class": "block"}).text), False)
     return my_class
