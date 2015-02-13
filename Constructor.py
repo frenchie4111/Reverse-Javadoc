@@ -27,7 +27,7 @@ def find_constructor(soup):
     if constructor:
         new_constructor = Constructor()
         new_constructor.sig = " ".join(str(constructor.findNext("pre").text).replace("\n", "").split())
-        if str(new_constructor.sig).find("(") - str(new_constructor.sig).find(")") != -1:
+        if str(new_constructor.sig).find("(") - str(new_constructor.sig).find(")") != -1 and constructor.findNext("div", {"class": "block"}):
             new_constructor.comments = ReverseDoc.create_comment(str(constructor.findNext("div", {"class": "block"}).text), True)
             constructor_parameters = constructor.findNext("dl")
             if constructor_parameters:

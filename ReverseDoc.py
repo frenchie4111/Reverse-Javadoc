@@ -167,20 +167,19 @@ def ReverseDoc(html):
     return my_class
 
 
-def main():
+def main(htmlfile=''):
     if len(sys.argv) > 1:
         htmlfile = sys.argv[1]
-    else:
+    elif not htmlfile:
         htmlfile = input("Enter file name with path: ")
     with open(htmlfile) as f:
         htmltext = f.read()
     java = ReverseDoc(htmltext)
-    print(htmlfile.split("/")[-1].split(".")[0])
-    with open(htmlfile.split("/")[-1].split(".")[0] + ".java", "w") as f:
+    with open(htmlfile.split(".")[0] + ".java", "w") as f:
         f.write(str(java))
         # pass
         # print(java)
 
 
-if (__name__ == '__main__'):
+if __name__ == '__main__':
     main()

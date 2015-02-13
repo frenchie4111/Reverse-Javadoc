@@ -81,14 +81,15 @@ def find_methods(soup):
     """
     method_list = list()
     summary = soup.find("a", {"name": "method.summary"}, recursive="true").findNext("table")
-    for table_row in summary.find_all("tr"):
-        if table_row.text.strip() != "Modifier and Type\nMethod and Description":
-            current_method = Method()
-            for table_code in table_row.find_all("code", recursive="true"):
-                if current_method.return_type == "":
-                    current_method.return_type = str(table_code.text).strip()
-                else:
-                    current_method.name = " ".join(str(table_code.text).replace("\n", "").split())
-            method_list.append(current_method)
-    find_methods_details(method_list, soup)
+    if summary:
+        for table_row in summary.find_all("tr"):
+            if table_row.text.strip() != "Modifier and Type\nMethod and Description":
+                current_method = Method()
+                for table_code in table_row.find_all("code", recursive="true"):
+                    if current_method.return_type == "":
+                        current_method.return_type = str(table_code.text).strip()
+                    else:
+                        current_method.name = " ".join(str(table_code.text).replace("\n", "").split())
+                method_list.append(current_method)
+        find_methods_details(method_list, soup)
     return method_list

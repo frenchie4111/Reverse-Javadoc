@@ -31,7 +31,8 @@ class StaticField():
 def find_fields_details(fields_list, soup):
     for field in fields_list:
         field_details = soup.find("a", {"name": field.name})
-        field.comments = ReverseDoc.create_comment(str(field_details.findNext("div", {"class": "block"}).text), True)
+        if field_details.findNext("div", {"class": "block"}):
+            field.comments = ReverseDoc.create_comment(str(field_details.findNext("div", {"class": "block"}).text), True)
 
 
 
