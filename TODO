@@ -1,4 +1,4 @@
-Ignore default constructors (public $CLASSNAME () )
+###Ignore default constructors (public $CLASSNAME () )#### Done
 Add package support
 Add class vs interface
 

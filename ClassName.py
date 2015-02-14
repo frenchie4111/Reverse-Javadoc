@@ -4,14 +4,9 @@ class ClassName():
 
     def __init__(self):
         self.comments = ""
-        self.public = True
         self.title = ""
 
     def __repr__(self):
-        if self.public:
-            class_type = "public"
-        else:
-            class_type = "private"
         return str(self.comments) + "\n */\n" + str(self.title)
 
 

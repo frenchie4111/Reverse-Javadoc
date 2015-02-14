@@ -36,4 +36,6 @@ def find_constructor(soup):
                     parameters_list.append([parameter.text.split("-", 1)[0].strip(),
                                             parameter.text.split("-", 1)[1].strip()])
                 new_constructor.parameters = parameters_list
+        else:
+            return None
         return new_constructor

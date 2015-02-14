@@ -175,11 +175,9 @@ def main(htmlfile=''):
     with open(htmlfile) as f:
         htmltext = f.read()
     java = ReverseDoc(htmltext)
-    with open(htmlfile.split(".")[0] + ".java", "w") as f:
+    print(htmlfile.split(".h")[0] + ".java")
+    with open(htmlfile.split(".h")[0] + ".java", "w") as f:
         f.write(str(java))
-        # pass
-        # print(java)
-
 
 if __name__ == '__main__':
     main()
