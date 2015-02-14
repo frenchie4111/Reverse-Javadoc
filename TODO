@@ -4,9 +4,9 @@ Add class vs interface
 
 LinkedQueue dequeue missing description
 Description copied from interface
-Add semicolon after this statements
-Patron toString has closing comment
+####Add semicolon after this statements#####
+####Patron toString has closing comment#####
 @Override
 Java.lang.String -> String
 Doesn't say what is implemented "Patron implements Prioritizeable (also needs to consider extends)"
-Prevent @return when method is void
+####Prevent @return when method is void#####
