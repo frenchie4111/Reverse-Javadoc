@@ -49,11 +49,11 @@ def findInterfaces(soup):
 
 
 def main():
-    # htmlfile = input("Enter url to main doc page: ")
-    # output = input("Enter complete location to output src files: ")
-    htmlfile = "http://www.cs.rit.edu/~csci142/Projects/01/doc/"
+    htmlfile = input("Enter url to main doc page: ")
+    output = input("Enter complete location to output src files: ")
+    # htmlfile = "http://www.cs.rit.edu/~csci142/Projects/01/doc/"
+    # output = "/home/andrew/java"
     javafile = htmlfile.replace("doc", "src")
-    output = "/home/andrew/java/"
     if htmlfile[-1] != "/":
         htmlfile += "/"
     if output[-1] != "/":

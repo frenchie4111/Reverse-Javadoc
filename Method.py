@@ -49,7 +49,7 @@ class Method():
             header += self.returns
         if self.comments or self.parameters or self.returns:
             header += "\n\t */\n"
-        if self.return_type.find("private") == -1:
+        if self.return_type.find("private") == -1 and self.return_type.find("protected") == -1:
             self.return_type = "public " + self.return_type
         if self.overrides:
             header += "\t@Override\n"
@@ -58,7 +58,7 @@ class Method():
         if self.return_type.find("boolean") != -1:
             self.method_body = "\n\t\treturn False;"
         if self.return_type.find("String") != -1:
-            self.method_body = "\n\t\treturn "";"
+            self.method_body = '\n\t\treturn "replace me";'
         if interface:
             return header + "\t" + self.return_type + " " + self.name + ";"
 
