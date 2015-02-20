@@ -149,7 +149,7 @@ def str_list(pyList):
 
 
 
-def ReverseDoc(html):
+def ReverseDoc(html, interface):
     """
     method ReverseDoc
 
@@ -168,13 +168,15 @@ def ReverseDoc(html):
 
 
 def main(htmlfile=''):
-    if len(sys.argv) > 1:
-        htmlfile = sys.argv[1]
-    elif not htmlfile:
-        htmlfile = input("Enter file name with path: ")
+    htmlfile = input("Enter file name with path: ")
+    interface = input("Is this an interface? (y/n) ")
+    if interface.upper() == "YES" or "Y":
+        interface = True
+    else:
+        interface = False
     with open(htmlfile) as f:
         htmltext = f.read()
-    java = ReverseDoc(htmltext)
+    java = ReverseDoc(htmltext, interface)
     print(htmlfile.split(".h")[0] + ".java")
     with open(htmlfile.split(".h")[0] + ".java", "w") as f:
         f.write(str(java))
