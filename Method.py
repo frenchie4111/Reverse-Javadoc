@@ -55,10 +55,12 @@ class Method():
             header += "\t@Override\n"
         if self.return_type.find("int") != -1:
             self.method_body = "\n\t\treturn 0;"
+        if self.return_type.find("double") != -1:
+            self.method_body = "\n\t\treturn 0.0;"
         if self.return_type.find("boolean") != -1:
             self.method_body = "\n\t\treturn False;"
         if self.return_type.find("String") != -1:
-            self.method_body = '\n\t\treturn "replace me";'
+            self.method_body = '\n\t\treturn "";'
         if interface:
             return header + "\t" + self.return_type + " " + self.name + ";"
 
