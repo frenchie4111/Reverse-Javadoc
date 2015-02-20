@@ -1,5 +1,7 @@
 import re
 import ReverseDoc
+
+
 class Method():
     """
     class method
@@ -24,7 +26,7 @@ class Method():
         self.method_body = ""
 
 
-    def __repr__(self):
+    def __repr__(self, interface):
         """
         method __repr__(self)
 
@@ -51,10 +53,14 @@ class Method():
             self.return_type = "public " + self.return_type
         if self.overrides:
             header += "\t@Override\n"
-        if self.return_type.find("void") == -1:
-            self.method_body = "\n\t\treturn null;"
-
-
+        if self.return_type.find("int") != -1:
+            self.method_body = "\n\t\treturn 0;"
+        if self.return_type.find("boolean") != -1:
+            self.method_body = "\n\t\treturn False;"
+        if self.return_type.find("String") != -1:
+            self.method_body = "\n\t\treturn "";"
+        if interface:
+            return header + "\t" + self.return_type + " " + self.name + ";"
 
         return header + "\t" + self.return_type + " " + self.name + " {" + "\n\t\t" + \
                "//TODO Add method body for " + self.name + self.method_body + "\n\t" + "}\n\n"
@@ -90,6 +96,7 @@ def find_methods_details(methods_list, soup):
         override = method_details.find("span", {"class": "overrideSpecifyLabel"})
         if override and str(override.text) == "Overrides:":
             method.overrides = True
+
 
 def find_methods(soup):
     """

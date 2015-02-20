@@ -8,7 +8,7 @@ class Constructor():
         self.parameters = list()
         self.body = list()
 
-    def __repr__(self):
+    def __repr__(self, interface):
         if self.parameters:
             for parameter in self.parameters:
                 self.body.append("\t\tthis." + parameter[0] + " = " + parameter[0] + ";\n")
@@ -20,8 +20,11 @@ class Constructor():
             header = str(self.comments) + "\n\t */\n"
         else:
             header = ""
+        if interface:
+            return header + "\t" + self.sig + ";"
+
         return header + "\t" + self.sig + " {" \
-               + "\n" + "\t\t//TODO Check for accuracy\n" + ReverseDoc.str_list(self.body) + "\n\t} \n\n"
+               + "\n" + "\t\t//TODO Check for accuracy\n" + ReverseDoc.str_list(self.body, interface) + "\n\t} \n\n"
 
 
 def find_constructor(soup):

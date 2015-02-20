@@ -61,13 +61,14 @@ class WrittenClass(object):
     """
 
     def __init__(self):
+        self.package = ""
         self.head_text = ""
         self.methods = list()
         self.fields = list()
         self.constructor = ""
 
 
-    def __str__(self):
+    def __str__(self, interface):
         """
         method __repr__(self)
 
@@ -78,13 +79,17 @@ class WrittenClass(object):
             str_list( self.methods )
         }
     """
-        javaClass = str(self.head_text) + " {\n\n"
+        javaClass = ""
+        if self.package:
+            javaClass += "package " + str(self.package) + ";\n"
+        if self.head_text:
+            javaClass += str(self.head_text) + " {\n\n"
         if self.fields:
-            javaClass += str(self.fields) + "\n\n"
+            javaClass += str_list_no_int(self.fields) + "\n\n"
         if self.constructor:
-            javaClass += str(self.constructor) + "\n\n"
+            javaClass += self.constructor.__repr__(interface) + "\n\n"
         if self.methods:
-            javaClass += str_list(self.methods)
+            javaClass += str_list(self.methods, interface)
         return javaClass + "\n}"
 
 def parameter_print(parameter_list):
@@ -93,13 +98,18 @@ def parameter_print(parameter_list):
         parameter[1] = " ".join(str(parameter[1]).replace("\n", "").split())
         new_list.append("\t * @param " + parameter[0] + " " + parameter[1] + "\n")
 
-    parameters = str_list(new_list)
+    parameters = str_list_no_int(new_list)
     if parameters:
         return "\n" + parameters[:len(parameters) - 1]
     else:
         return ""
+def str_list_no_int(pyList):
+    new_str = ""
+    for list_item in pyList:
+        new_str += list_item.__repr__()
+    return new_str
 
-def str_list(pyList):
+def str_list(pyList, interface):
     """
     method str_list
 
@@ -110,7 +120,7 @@ def str_list(pyList):
 """
     new_str = ""
     for list_item in pyList:
-        new_str += str(list_item)
+        new_str += list_item.__repr__(interface)
     return new_str
 
 
@@ -131,25 +141,14 @@ def create_comment(comment_text, indent):
     return new_comment
 
 
-
-def str_list(pyList):
-    """
-    method str_list
-
-    Return a string containing the str( ) of the items in the given pyList
-
-    Arguments:
-        pyList - python list to be converted to string
-"""
-    new_str = ""
-    for list_item in pyList:
-        new_str += str(list_item)
-    return new_str
+def find_package(soup):
+    package = soup.find("div", {"class": "subTitle"})
+    if package:
+        return package.text
 
 
 
-
-def ReverseDoc(html, interface):
+def ReverseDoc(html):
     """
     method ReverseDoc
 
@@ -160,6 +159,7 @@ def ReverseDoc(html, interface):
 """
     my_class = WrittenClass()
     soup = BeautifulSoup(html)
+    my_class.package = find_package(soup)
     my_class.head_text = ClassName.find_class_name(soup)
     my_class.fields = Fields.find_fields(soup)
     my_class.methods = Method.find_methods(soup)
