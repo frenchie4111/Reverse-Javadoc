@@ -71,7 +71,7 @@ def main():
         try:
             new_class = (urlopen(javafile + java_class.location.replace("html", "java")).read(), "try")
         except:
-            new_class = (ReverseDoc.ReverseDoc(urllib.request.urlopen(htmlfile + java_class.location).read()), "except")
+            new_class = (ReverseDoc.ReverseDoc(urllib.request.urlopen(htmlfile + java_class.location).read(), htmlfile), "except")
         path = os.path.join(output, java_class.location.replace(".html", "") + ".java")
         dirpath = path.rsplit("/", 1)[0] + "/"
         if not os.path.exists(dirpath):
@@ -87,7 +87,7 @@ def main():
         try:
             new_interface = (urlopen(javafile + interface.location.replace("html", "java")).read(), "try")
         except urllib.error.HTTPError:
-            new_interface = (ReverseDoc.ReverseDoc(urllib.request.urlopen(htmlfile + interface.location).read()), "except")
+            new_interface = (ReverseDoc.ReverseDoc(urllib.request.urlopen(htmlfile + interface.location).read(), htmlfile), "except")
         path = os.path.join(output, interface.location.replace(".html", "") + ".java")
         dirpath = path.rsplit("/", 1)[0] + "/"
         if not os.path.exists(dirpath):

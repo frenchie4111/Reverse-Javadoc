@@ -38,11 +38,11 @@ class Method():
             //Body
         }
         """
-        header = ''
+        header = ""
         if self.comments:
             header += str(self.comments)
         if self.parameters:
-            header += ReverseDoc.parameter_print(self.parameters)
+            header += str(ReverseDoc.parameter_print(self.parameters))
         if self.returns:
             self.returns = " ".join(str(self.returns).replace("\n", "").split())
             self.returns = "\n\t * @return " + str(self.returns)
@@ -61,8 +61,8 @@ class Method():
             self.method_body = "\n\t\treturn False;"
         if self.return_type.find("String") != -1:
             self.method_body = '\n\t\treturn "";'
-        if interface:
-            return header + "\t" + self.return_type + " " + self.name + ";"
+        if interface or self.return_type.find("abstract") != -1:
+            return header + "\t" + self.return_type + " " + self.name + ";\n\n"
 
         return header + "\t" + self.return_type + " " + self.name + " {" + "\n\t\t" + \
                "//TODO Add method body for " + self.name + self.method_body + "\n\t" + "}\n\n"
