@@ -31,7 +31,7 @@ class StaticField():
         //comment
         self.instance_type self.name
     """
-        return str(self.comments) + "\n\t */\n "+ "\t" + self.instance_type + " " + self.name + " = " + self.value + ";\n\n"
+        return str(self.comments) + "\n\t */\n "+ "\t" + self.instance_type + " " + self.name + self.value + ";\n\n"
 
 def find_fields_details(fields_list, soup):
     for field in fields_list:
@@ -73,7 +73,7 @@ def find_fields(soup, location):
             value_check = constant_soup.find("a", {"name": re.compile(field.name)})
             if value_check:
                 field.value = str(value_check.findNext("td", {"class": "colLast"}).text)
-                print(field.value)
+                field.value = " = " + field.value
     except urllib.error.HTTPError:
         pass
     return fields_list
