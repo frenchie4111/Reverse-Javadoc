@@ -1,4 +1,8 @@
 import ReverseDoc
+from urllib.request import urlopen
+import urllib.error
+from bs4 import BeautifulSoup
+import re
 class StaticField():
     """
     class static_field
@@ -16,6 +20,7 @@ class StaticField():
         # self.comments.header = False
         self.instance_type = ""
         self.name = ""
+        self.value = ""
 
 
     def __repr__(self):
@@ -26,16 +31,23 @@ class StaticField():
         //comment
         self.instance_type self.name
     """
-        return str(self.comments) + "\n\t */\n "+ "\t" + self.instance_type + " " + self.name + ";\n\n"
+        return str(self.comments) + "\n\t */\n "+ "\t" + self.instance_type + " " + self.name + self.value + ";\n\n"
 
 def find_fields_details(fields_list, soup):
     for field in fields_list:
         field_details = soup.find("a", {"name": field.name})
-        field.comments = ReverseDoc.create_comment(str(field_details.findNext("div", {"class": "block"}).text), True)
+        if field_details.findNext("div", {"class": "block"}):
+            field.comments = ReverseDoc.create_comment(str(field_details.findNext("div", {"class": "block"}).text), True)
+
+def check_constant(field):
+    """
+    Checks to see if the field has a constant value and sets it to such if possible
+    :param field: field to check
+    """
 
 
 
-def find_fields(soup):
+def find_fields(soup, location):
     """
     method find_fields
 
@@ -54,4 +66,14 @@ def find_fields(soup):
                         new_field.name = str(table_code.text)
                 fields_list.append(new_field)
         find_fields_details(fields_list, soup)
+    try:
+        constants = urlopen(location + "constant-values.html").read()
+        constant_soup = BeautifulSoup(constants)
+        for field in fields_list:
+            value_check = constant_soup.find("a", {"name": re.compile(field.name)})
+            if value_check:
+                field.value = str(value_check.findNext("td", {"class": "colLast"}).text)
+                field.value = " = " + field.value
+    except urllib.error.HTTPError:
+        pass
     return fields_list

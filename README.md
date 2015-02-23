@@ -13,6 +13,6 @@ run:
 
 Then type:
 
-	python3 ReverseDoc.py $HTML_FILE_NAME.html
+	python3 ClassFinder.py
 
-The resulting java file will be placed in the same directory as the ReverseDoc.py file.
+Follow the prompts to put the output at a specified location. A source folder (src) will automatically be added to the provided path.

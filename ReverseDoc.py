@@ -30,22 +30,20 @@ class Comment():
         if comment_type is "block" returns comment string in format:
             /**
              * self.comment_lines
-             */
-        if comment_type is "line" returns comment string in format:
-            # self.comment_lines[0]
+
+        Doesn't close the comment to allow addition of parameters and returns
+
+        post-condition: cursor is at end of comment line, no \n has been inserted
         """
         if self.indent:
             new_str = "\t/**\n"
             for comment_line in self.comment_lines:
                 new_str += "\t * " + comment_line + "\n"
-            # new_str += "\t */\n"
         else:
             new_str = "/**\n"
             for comment_line in self.comment_lines:
                 new_str += " * " + comment_line + "\n"
-
-            # new_str += " */\n"
-        return new_str[:len(new_str) - 1]
+        return new_str[:len(new_str) - 1]  # removes new line character from end to prevent gaps in comments
 
 
 class WrittenClass(object):
@@ -61,13 +59,14 @@ class WrittenClass(object):
     """
 
     def __init__(self):
+        self.package = ""
         self.head_text = ""
         self.methods = list()
         self.fields = list()
         self.constructor = ""
 
 
-    def __str__(self):
+    def __str__(self, interface):
         """
         method __repr__(self)
 
@@ -78,28 +77,49 @@ class WrittenClass(object):
             str_list( self.methods )
         }
     """
-        javaClass = str(self.head_text) + " {\n\n"
+        javaClass = ""
+        if self.package:
+            javaClass += "package " + str(self.package) + ";\n"
+        if self.head_text:
+            javaClass += str(self.head_text) + " {\n\n"
         if self.fields:
-            javaClass += str(self.fields) + "\n\n"
+            javaClass += str_list_no_int(self.fields) + "\n\n"
         if self.constructor:
-            javaClass += str(self.constructor) + "\n\n"
+            javaClass += self.constructor.__repr__(interface) + "\n\n"
         if self.methods:
-            javaClass += str_list(self.methods)
+            javaClass += str_list(self.methods, interface)
         return javaClass + "\n}"
 
-def parameter_print(parameter_list):
-    new_list = list()
-    for parameter in parameter_list:
-        parameter[1] = " ".join(str(parameter[1]).replace("\n", "").split())
-        new_list.append("\t * @param " + parameter[0] + " " + parameter[1] + "\n")
 
-    parameters = str_list(new_list)
-    if parameters:
-        return "\n" + parameters[:len(parameters) - 1]
+def parameter_print(parameters_in):
+    """
+    Takes a list of parameters and turns it into a single string (with line breaks)
+
+    The first item in the list is the parameter name and the second is the description.
+    pre-condition: cursor is at the end of the previous line
+    post-condition: cursor is at the end of the previous line
+    """
+    parameters_out = ""
+    for parameter in parameters_in:
+        parameter[1] = " ".join(
+            str(parameter[1]).replace("\n", "").split())  # removes new line characters from a parameter's description
+        parameters_out += "\t * @param " + parameter[0] + " " + parameter[1] + "\n"
+
+    if parameters_out:
+        return "\n" + parameters_out[:len(parameters_out) - 1]  # starts a new line for the first parameter to print
+                                                                # removes last new line so cursor is at end of last line
     else:
         return ""
 
-def str_list(pyList):
+
+def str_list_no_int(pyList):
+    new_str = ""
+    for list_item in pyList:
+        new_str += str(list_item.__repr__())
+    return new_str
+
+
+def str_list(pyList, interface):
     """
     method str_list
 
@@ -110,7 +130,7 @@ def str_list(pyList):
 """
     new_str = ""
     for list_item in pyList:
-        new_str += str(list_item)
+        new_str += str(list_item.__repr__(interface))
     return new_str
 
 
@@ -131,25 +151,13 @@ def create_comment(comment_text, indent):
     return new_comment
 
 
-
-def str_list(pyList):
-    """
-    method str_list
-
-    Return a string containing the str( ) of the items in the given pyList
-
-    Arguments:
-        pyList - python list to be converted to string
-"""
-    new_str = ""
-    for list_item in pyList:
-        new_str += str(list_item)
-    return new_str
+def find_package(soup):
+    package = soup.find("div", {"class": "subTitle"})
+    if package:
+        return package.text
 
 
-
-
-def ReverseDoc(html):
+def ReverseDoc(html, location):
     """
     method ReverseDoc
 
@@ -160,27 +168,28 @@ def ReverseDoc(html):
 """
     my_class = WrittenClass()
     soup = BeautifulSoup(html)
+    my_class.package = find_package(soup)
     my_class.head_text = ClassName.find_class_name(soup)
-    my_class.fields = Fields.find_fields(soup)
+    my_class.fields = Fields.find_fields(soup, location)
     my_class.methods = Method.find_methods(soup)
     my_class.constructor = Constructor.find_constructor(soup)
     return my_class
 
 
-def main():
-    if len(sys.argv) > 1:
-        htmlfile = sys.argv[1]
+def main(htmlfile=''):
+    htmlfile = input("Enter file name with path: ")
+    interface = input("Is this an interface? (y/n) ")
+    if interface.upper() == "YES" or "Y":
+        interface = True
     else:
-        htmlfile = input("Enter file name with path: ")
+        interface = False
     with open(htmlfile) as f:
         htmltext = f.read()
-    java = ReverseDoc(htmltext)
-    print(htmlfile.split("/")[-1].split(".")[0])
-    with open(htmlfile.split("/")[-1].split(".")[0] + ".java", "w") as f:
+    java = ReverseDoc(htmltext, interface)
+    print(htmlfile.split(".h")[0] + ".java")
+    with open(htmlfile.split(".h")[0] + ".java", "w") as f:
         f.write(str(java))
-        # pass
-        # print(java)
 
 
-if (__name__ == '__main__'):
+if __name__ == '__main__':
     main()
